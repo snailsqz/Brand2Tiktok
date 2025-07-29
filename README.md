@@ -27,6 +27,8 @@ This project was developed as part of a case study for the AI Automation positio
 
 1.  **Prep Your Influencer Data:**
     * Grab your influencer data (from Apify or wherever you sourced it) and make sure it's in a CSV and column header like in the dataset.
+    * for my tiktok dataset i got it from apify, its called TikTok Scraper.
+    * once you runned it, choose authors under the output to get EXACT columns as mine and export it as CSV.
 
 2.  **Get Your Brand Profile Ready:**
     * Tweak the `brand_text` variable in the script to be your brand's description in Thai or Eng. The more detailed and keyword-rich it is, the better!
