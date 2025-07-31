@@ -34,7 +34,7 @@ This project was developed as part of a case study for the AI Automation positio
     * Tweak the `brand_text` variable in the script to be your brand's description in Thai or Eng. The more detailed and keyword-rich it is, the better!
 
 3.  **Run the Script!!!**
-    * You will need to install libraries such as --> pandas,apify-client,python-dotenv,pythainlp(for thai lang),scikit-learn
+    * You will need to install libraries such as --> pandas,apify-client,python-dotenv,pythainlp(for thai lang),scikit-learn,nltk(for eng)
     * By using pip install 'name' 
 
 4.  **Check Out the Results:**
