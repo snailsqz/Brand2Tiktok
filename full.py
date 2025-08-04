@@ -79,18 +79,36 @@ def get_data(apikey, search_queries):
                 'textLanguage'
             ]
         df = final_df[desired_columns]
+        # Display the first few rows and columns of the combined DataFrame
+        print("\nFirst 5 rows of the combined DataFrame:")
+        print(df.head())
+        print("\nColumns in the combined DataFrame:")
+        print(df.columns.tolist())
+        
+        #Apply Language Filter
+        desired_language = input("Enter the desired text language (en,es or leave blank for no filter): ").strip().lower()
+        if desired_language: # Check if the user actually provided a language
+            print(f"Filtering for text language: '{desired_language}'")
+            df = df[
+                df['textLanguage'].str.lower() == desired_language
+            ]
+            print(f"After filtering, {len(df)} rows remain.")
+        else:
+            print("No language filter applied. Keeping all languages.")
+            
 
+        save = input("Do you want to save to CSV? (Y,N): ").strip().upper()
+        if save != 'Y':
+            print("Data not saved to CSV.")
+            return
         # Define the CSV file name
         output_csv_file = f"{search_queries[0]}.csv"
 
         # Save the final DataFrame to a CSV file
         df.to_csv(output_csv_file, index=False, encoding='utf-8')
         print(f"Combined data successfully saved to {output_csv_file}")
-        # Display the first few rows and columns of the combined DataFrame
-        print("\nFirst 5 rows of the combined DataFrame:")
-        print(df.head())
-        print("\nColumns in the combined DataFrame:")
-        print(df.columns.tolist())
+
+        
 
     else:
         print("No data items were retrieved from the Apify dataset.")
