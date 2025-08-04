@@ -1,8 +1,13 @@
+#REMOVE DUPE
 from apify_client import ApifyClient
 import pandas as pd
 import json
-from datetime import datetime
-
+import re
+import nltk
+from nltk.corpus import stopwords
+from nltk.stem import WordNetLemmatizer
+from pythainlp.tokenize import word_tokenize
+from pythainlp.corpus import thai_stopwords
 
 def get_data(apikey, search_queries):
     client = ApifyClient(apikey)
@@ -39,8 +44,8 @@ def get_data(apikey, search_queries):
     # --- Data Processing Start ---
     if data_items:
         # 1. Create initial DataFrame
+        global df
         df = pd.DataFrame(data_items)
-
         # 2. Ensure 'authorMeta' values are proper dictionaries. now it's a blob that contain more details of author.
         def parse_json_if_string(data):
             if isinstance(data, str):
@@ -86,7 +91,11 @@ def get_data(apikey, search_queries):
         print(df.columns.tolist())
         
         #Apply Language Filter
-        desired_language = input("Enter the desired text language (en,es or leave blank for no filter): ").strip().lower()
+        global desired_language
+        print("\nLanguage Filter:")
+        print("You can filter the text language by entering 'en' for English, 'th' for Thai, or leave it blank to keep all languages.")
+        # Prompt user for desired language
+        desired_language = input("Enter the desired text language: ").strip().lower()
         if desired_language: # Check if the user actually provided a language
             print(f"Filtering for text language: '{desired_language}'")
             df = df[
@@ -107,12 +116,82 @@ def get_data(apikey, search_queries):
         # Save the final DataFrame to a CSV file
         df.to_csv(output_csv_file, index=False, encoding='utf-8')
         print(f"Combined data successfully saved to {output_csv_file}")
-
-        
-
     else:
         print("No data items were retrieved from the Apify dataset.")
 
+def preprocess_data(df):
+    if(desired_language == 'en'):
+        nltk.download('stopwords')
+        nltk.download('wordnet')
+        stop_words = set(stopwords.words('english'))
+        lemmatizer = WordNetLemmatizer()
+
+        def preprocess_text(text):
+            if not isinstance(text, str): # Handle non-string inputs like None
+                return ""
+            text = text.lower()
+            text = re.sub(r'[^a-z0-9\s]', '', text) # Remove punctuation
+            tokens = text.split()
+            tokens = [lemmatizer.lemmatize(word) for word in tokens if word not in stop_words]
+            return " ".join(tokens)
+
+        # Apply to influencer data
+        df['processed_signature'] = df['author_signature'].apply(preprocess_text)
+        df['processed_text'] = df['text'].apply(preprocess_text)
+
+        # Combine relevant influencer text for comparison
+        df['influencer_combined_text'] = df['processed_signature'] + " " + df['processed_text']
+
+        brand_description_text = "luxury Italian sports car manufacturer renowned for its high-performance vehicles"
+        processed_brand_text = preprocess_text(brand_description_text)
+
+    elif(desired_language == 'th'):
+        # Load Thai stopwords once
+        thai_stop_words = set(thai_stopwords())
+
+        def preprocess_text(text):
+            if not isinstance(text, str): # Handle non-string inputs like None
+                return ""
+
+            emoji_pattern = re.compile(
+                "["
+                "\U0001F600-\U0001F64F"  # emoticons
+                "\U0001F300-\U0001F5FF"  # symbols & pictographs
+                "\U0001F680-\U0001F6FF"  # transport & map symbols
+                "\U0001F1E0-\U0001F1FF"  # flags (iOS)
+                "\U00002702-\U000027B0"  # Dingbats
+                "\U000024C2-\U0001F251"
+                "\U0001F900-\U0001F9FF"  # Supplemental Symbols and Pictographs
+                "\U00002600-\U000026FF"  # Miscellaneous Symbols
+                "\U00002500-\U000025FF"  # Box Drawing, Block Elements
+                "]+", flags=re.UNICODE
+            )
+            text = emoji_pattern.sub(r'', text)
+            # Remove characters that are NOT Thai letters, numbers, #, @, or spaces
+            text = re.sub(r'[^\u0E00-\u0E7F\s]', '', text)
+
+            tokens = word_tokenize(text, keep_whitespace=False)
+
+
+            tokens = [word for word in tokens if word not in thai_stop_words and word.strip() != '']
+
+            return " ".join(tokens)
+
+    df['processed_signature'] = df['author_signature'].apply(preprocess_text)
+    df['processed_text'] = df['text'].apply(preprocess_text)
+
+    df['influencer_combined_text'] = df['processed_signature'] + " " + df['processed_text']
+
+    brand_description_text = (
+        "โค้ก กินกับอะไรก็อร่อย อาหารเผ็ดๆยิ่งต้องกินกับโค้กเลย"
+    )
+    processed_brand_text = preprocess_text(brand_description_text)
+
+    print("Processed Brand Text:")
+    print(processed_brand_text)
+    print("\nProcessed Influencer Texts (first 2 rows):")
+    print(df[['author_name', 'influencer_combined_text']].head(2).to_string())
+    
 
 def main():
     print("Welcome to the TikTok Data Scraper!")
@@ -129,6 +208,7 @@ def main():
         print("No API key provided. Exiting.")
         return
     get_data(apikey, search_queries)
-
+    
+    
 if __name__ == "__main__":
     main()
