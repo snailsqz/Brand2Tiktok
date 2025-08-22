@@ -25,10 +25,8 @@ The goal of this project is to create a tool for finding and ranking TikTok infl
 
 ## How to Use It
 
-1.  **Prep Your Influencer Data:**
-    * Grab your influencer data (from Apify or wherever you sourced it) and make sure it's in a CSV and column header like in the dataset.
-    * for my tiktok dataset i got it from apify, its called TikTok Scraper.
-    * once you runned it, choose authors under the output to get EXACT columns as mine and export it as CSV.
+1.  **Prep Your API Key:**
+    * To get data from Apify, you'll need your personal API token from Settings.
 
 2.  **Define Your Brand's Product Categories/Keywords:
     * Instead of a long, flowy description, you should provide a set of specific keywords that describe your brand's product category or niche.
