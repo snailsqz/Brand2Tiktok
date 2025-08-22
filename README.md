@@ -1,6 +1,6 @@
-# TikTok KOL Relevance Matcher (for Convert Cake🍰)
+# TikTok KOL Relevance Matcher
 
-This project was developed as part of a case study for the AI Automation position at Convert Cake. Its goal is to create a tool for finding and ranking TikTok influencers based on their relevance to a given brand, utilizing Thai Natural Language Processing (NLP) techniques but i did one for eng too.
+The goal of this project is to create a tool for finding and ranking TikTok influencers based on their relevance to a given brand, utilizing Thai and Eng Natural Language Processing (NLP) techniques.
 
 ## Key Features
 
@@ -30,8 +30,9 @@ This project was developed as part of a case study for the AI Automation positio
     * for my tiktok dataset i got it from apify, its called TikTok Scraper.
     * once you runned it, choose authors under the output to get EXACT columns as mine and export it as CSV.
 
-2.  **Get Your Brand Profile Ready:**
-    * Tweak the `brand_text` variable in the script to be your brand's description in Thai or Eng. The more detailed and keyword-rich it is, the better!
+2.  **Define Your Brand's Product Categories/Keywords:
+    * Instead of a long, flowy description, you should provide a set of specific keywords that describe your brand's product category or niche.
+    * For example, if your brand is Coke, you might use keywords from the search results like "อาหารเผ็ด" (spicy food) and "เครื่องดื่ม" (drinks). This helps the model quickly understand your target niche and find influencers who talk about those specific topics.
 
 3.  **Run the Script!!!**
     * You will need to install libraries such as --> pandas,apify-client,python-dotenv,pythainlp(for thai lang),scikit-learn,nltk(for eng)
@@ -46,11 +47,11 @@ So when you run the script, you'll get a super cool table printed out. This tabl
 
 * `authorMeta.fans`: How many followers they've got.
 
-* `relevance_score`: This is super important! It's a score from 0 to 1, telling you how well their content matches your brand. Higher is better!
+* `relevance_score`: This is super important! It's a score from 0 to 1, telling you how well their content matches your brand. Higher is better.
 
 * `total_score`: This is the final score we use to rank them. It's a mix of how relevant they are and how many fans they have.
 
-Basically, the influencers with the highest `total_score` are your top picks!
+Basically, the influencers with the highest `total_score` are your top picks.
 
 ## 📞 Get in Touch!
 
