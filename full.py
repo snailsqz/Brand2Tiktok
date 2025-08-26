@@ -8,6 +8,8 @@ from nltk.corpus import stopwords
 from nltk.stem import WordNetLemmatizer
 from pythainlp.tokenize import word_tokenize
 from pythainlp.corpus import thai_stopwords
+from sklearn.feature_extraction.text import TfidfVectorizer
+from sklearn.metrics.pairwise import cosine_similarity
 
 def get_data(apikey, search_queries):
     client = ApifyClient(apikey)
@@ -43,10 +45,8 @@ def get_data(apikey, search_queries):
 
     # --- Data Processing Start ---
     if data_items:
-        # 1. Create initial DataFrame
         global df
         df = pd.DataFrame(data_items)
-        # 2. Ensure 'authorMeta' values are proper dictionaries. now it's a blob that contain more details of author.
         def parse_json_if_string(data):
             if isinstance(data, str):
                 try:
@@ -61,17 +61,14 @@ def get_data(apikey, search_queries):
 
         df['authorMeta'] = df['authorMeta'].apply(parse_json_if_string)
 
-        # 3. Flatten 'authorMeta' into a new DataFrame
+        
         author_meta_df = pd.json_normalize(df['authorMeta'])
 
-        # IMPORTANT: Rename columns in author_meta_df to avoid conflicts with existing columns
-        # and to clearly distinguish author-related fields.
         author_meta_df = author_meta_df.add_prefix('author_')
 
-        # 4. Concatenate the original DataFrame (without the nested 'authorMeta' column)
         final_df = pd.concat([df.drop('authorMeta', axis=1), author_meta_df], axis=1)
         
-        #this is the part you get the column u want
+        #This is the part you'll get the column you want
         desired_columns = [
                 'text',              # From the original video data
                 'author_id',         # From authorMeta, renamed by add_prefix
@@ -89,7 +86,8 @@ def get_data(apikey, search_queries):
         print(df.head())
         print("\nColumns in the combined DataFrame:")
         print(df.columns.tolist())
-        
+        #drop if author_name duplicate
+        df = df.drop_duplicates(subset=['author_name'])
         #Apply Language Filter
         global desired_language
         print("\nLanguage Filter:")
@@ -111,7 +109,8 @@ def get_data(apikey, search_queries):
             print("Data not saved to CSV.")
             return
         # Define the CSV file name
-        output_csv_file = f"{search_queries[0]}.csv"
+        csvname = input("Enter the CSV file name: ").strip()
+        output_csv_file = f"{csvname}.csv"
 
         # Save the final DataFrame to a CSV file
         df.to_csv(output_csv_file, index=False, encoding='utf-8')
@@ -182,15 +181,44 @@ def preprocess_data(df):
 
     df['influencer_combined_text'] = df['processed_signature'] + " " + df['processed_text']
 
-    brand_description_text = (
-        "โค้ก กินกับอะไรก็อร่อย อาหารเผ็ดๆยิ่งต้องกินกับโค้กเลย"
-    )
+    brand_description_text = input("Enter the brand description(Yummy,Pops,อาหารอีสาน,ซ่า): ")
     processed_brand_text = preprocess_text(brand_description_text)
 
     print("Processed Brand Text:")
     print(processed_brand_text)
-    print("\nProcessed Influencer Texts (first 2 rows):")
-    print(df[['author_name', 'influencer_combined_text']].head(2).to_string())
+    return processed_brand_text
+
+def find_similarity(df, processed_brand_text):
+    # Create a corpus of all texts (brand + all influencer texts)
+    corpus = [processed_brand_text] + df['influencer_combined_text'].tolist()
+    vectorizer = TfidfVectorizer(max_features=4000)
+    tfidf_matrix = vectorizer.fit_transform(corpus)
+    brand_vector = tfidf_matrix[0:1]
+    influencer_vectors = tfidf_matrix[1:]
+    
+    similarity_scores = cosine_similarity(brand_vector, influencer_vectors).flatten()
+    df['relevance_score'] = similarity_scores
+    
+    while True:
+        weight_relevance = float(input("Enter the weight for relevance (0-1): "))
+        weight_fans = float(input("Enter the weight for fans (0-1): "))
+        if 0 <= weight_relevance <= 1 and 0 <= weight_fans <= 1:
+            break
+        else:
+            print("Invalid weights. Please enter values between 0 and 1.")
+
+    # Calculate the total score
+    max_fans = df['author_fans'].max()
+    df['normalized_fans'] = df['author_fans'] / max_fans # Scale fans to 0-1
+
+    df['total_score'] = (df['relevance_score'] * weight_relevance) + \
+                                    (df['normalized_fans'] * weight_fans)
+
+    # Sort by the total score to get your final ranked list
+    final_ranked_influencers = df.sort_values(by='total_score', ascending=False)
+
+    print("\nFinal Ranked Influencers (by Total Score):")
+    print(final_ranked_influencers[['author_name', 'author_fans', 'relevance_score', 'total_score']].head(10))
     
 
 def main():
@@ -208,6 +236,8 @@ def main():
         print("No API key provided. Exiting.")
         return
     get_data(apikey, search_queries)
+    processed_brand_text = preprocess_data(df)
+    find_similarity(df, processed_brand_text)
     
     
 if __name__ == "__main__":
