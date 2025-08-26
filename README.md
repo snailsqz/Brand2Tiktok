@@ -28,7 +28,7 @@ The goal of this project is to create a tool for finding and ranking TikTok infl
 1.  **Prep Your API Key:**
     * To get data from Apify, you'll need your personal API token from Settings.
 
-2.  **Define Your Brand's Product Categories/Keywords:
+2.  **Define Your Brand's Product Categories/Keywords:**
     * Instead of a long, flowy description, you should provide a set of specific keywords that describe your brand's product category or niche.
     * For example, if your brand is Coke, you might use keywords from the search results like "อาหารเผ็ด" (spicy food) and "เครื่องดื่ม" (drinks). This helps the model quickly understand your target niche and find influencers who talk about those specific topics.
 
