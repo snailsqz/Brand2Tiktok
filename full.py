@@ -10,6 +10,8 @@ from pythainlp.tokenize import word_tokenize
 from pythainlp.corpus import thai_stopwords
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
+from sklearn.feature_extraction.text import TfidfVectorizer
+from sklearn.metrics.pairwise import cosine_similarity
 from dotenv import load_dotenv
 
 def get_data(apikey, search_queries):
