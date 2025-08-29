@@ -46,6 +46,7 @@ The goal of this project is to create a tool for finding and ranking TikTok infl
 3.  **Run the Script!!!**
 
     - pip install -r requirements.txt
+    - The application is program.py (currently im working on FastAPI for this project)
     - And run it
 
 4.  **Check Out the Results:**
