@@ -35,8 +35,13 @@ The goal of this project is to create a tool for finding and ranking TikTok infl
 
 2.  **Define Your Brand's Product Categories/Keywords:**
 
-    - Instead of a long, flowy description, you should provide a set of specific keywords that describe your brand's product category or niche.
-    - For example, if your brand is Coke, you might use keywords from the search results like "อาหารเผ็ด" (spicy food) and "เครื่องดื่ม" (drinks). This helps the model quickly understand your target niche and find influencers who talk about those specific topics.
+    _Input 1: Content Type_
+
+    - Specify the type of video you are looking for (e.g., cooking videos, product reviews, travel vlogs). This information helps the system narrow the search to content that matches your interests.
+
+    _Input 2: Brand's Niche_
+
+    - Provide keywords related to your brand or product (e.g., spicy food, drinks, fashion, cosmetics). This helps the system find influencers whose content aligns with your target audience.
 
 3.  **Run the Script!!!**
 
