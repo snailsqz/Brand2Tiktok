@@ -19,7 +19,7 @@ def get_data(apikey, search_queries):
     run_input = {
         #"hashtags": ["fyp"],
         "searchQueries": search_queries,
-        "resultsPerPage": 15,
+        "resultsPerPage": 15, #You can change it depends on your budget.
         "profileScrapeSections": ["videos"],
         "profileSorting": "latest",
         "excludePinnedPosts": False,

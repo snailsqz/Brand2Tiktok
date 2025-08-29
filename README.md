@@ -4,50 +4,57 @@ The goal of this project is to create a tool for finding and ranking TikTok infl
 
 ## Key Features
 
-* **Influencer Data Processing:** Reads and manages influencer data from JSON sources.
+- **Influencer Data Processing:** Reads and manages influencer data from JSON sources.
 
-* **Text Preprocessing:**
-    * Removes emojis, numbers, and irrelevant symbols from text (like bios and video descriptions).
-    * Converts text to lowercase.
+- **Text Preprocessing:**
 
-* **Thai NLP (Natural Language Processing):**
-    * **Thai Word Tokenization:** Uses `PyThaiNLP` to accurately split Thai text into individual words.
-    * **Thai Stop Word Removal:** Filters out common, less meaningful words to highlight key terms.
+  - Removes emojis, numbers, and irrelevant symbols from text (like bios and video descriptions).
+  - Converts text to lowercase.
 
-* **Relevance Scoring:**
-    * Employs **TF-IDF (Term Frequency-Inverse Document Frequency)** to transform brand and influencer texts into numerical vectors.
-    * Uses **Cosine Similarity** to measure the resemblance between brand and influencer text vectors.
+- **Thai NLP (Natural Language Processing):**
 
-* **Influencer Ranking:**
-    * Calculates a `total_score` by weighting the `relevance_score` and `authorMeta.fans` (follower count) to identify influencers who are both relevant and impactful.
+  - **Thai Word Tokenization:** Uses `PyThaiNLP` to accurately split Thai text into individual words.
+  - **Thai Stop Word Removal:** Filters out common, less meaningful words to highlight key terms.
 
-* **Data Export:** Converts the final results into a CSV file for further analysis or use.
+- **Relevance Scoring:**
+
+  - Employs **TF-IDF (Term Frequency-Inverse Document Frequency)** to transform brand and influencer texts into numerical vectors.
+  - Uses **Cosine Similarity** to measure the resemblance between brand and influencer text vectors.
+
+- **Influencer Ranking:**
+
+  - Calculates a `total_score` by weighting the `relevance_score` and `authorMeta.fans` (follower count) to identify influencers who are both relevant and impactful.
+
+- **Data Export:** Converts the final results into a CSV file for further analysis or use.
 
 ## How to Use It
 
 1.  **Prep Your API Key:**
-    * To get data from Apify, you'll need your personal API token from Settings.
+
+    - To get data from Apify, you'll need your personal API token from Settings.
 
 2.  **Define Your Brand's Product Categories/Keywords:**
-    * Instead of a long, flowy description, you should provide a set of specific keywords that describe your brand's product category or niche.
-    * For example, if your brand is Coke, you might use keywords from the search results like "อาหารเผ็ด" (spicy food) and "เครื่องดื่ม" (drinks). This helps the model quickly understand your target niche and find influencers who talk about those specific topics.
+
+    - Instead of a long, flowy description, you should provide a set of specific keywords that describe your brand's product category or niche.
+    - For example, if your brand is Coke, you might use keywords from the search results like "อาหารเผ็ด" (spicy food) and "เครื่องดื่ม" (drinks). This helps the model quickly understand your target niche and find influencers who talk about those specific topics.
 
 3.  **Run the Script!!!**
-    * You will need to install libraries such as --> pandas,apify-client,python-dotenv,pythainlp(for thai lang),scikit-learn,nltk(for eng)
-    * By using pip install 'name' 
+
+    - pip install -r requirements.txt
+    - And run it
 
 4.  **Check Out the Results:**
-    * The script will print a neat table of ranked influencers (sorted by their `total_score`) right there in your console.
+    - The script will print a neat table of ranked influencers (sorted by their `total_score`) right there in your console.
 
 So when you run the script, you'll get a super cool table printed out. This table will show you a ranked list of influencers, with the most relevant ones right at the top! Here's what you'll see for each influencer:
 
-* `authorMeta.name`: The influencer's name.
+- `authorMeta.name`: The influencer's name.
 
-* `authorMeta.fans`: How many followers they've got.
+- `authorMeta.fans`: How many followers they've got.
 
-* `relevance_score`: This is super important! It's a score from 0 to 1, telling you how well their content matches your brand. Higher is better.
+- `relevance_score`: This is super important! It's a score from 0 to 1, telling you how well their content matches your brand. Higher is better.
 
-* `total_score`: This is the final score we use to rank them. It's a mix of how relevant they are and how many fans they have.
+- `total_score`: This is the final score we use to rank them. It's a mix of how relevant they are and how many fans they have.
 
 Basically, the influencers with the highest `total_score` are your top picks.
 
@@ -55,6 +62,6 @@ Basically, the influencers with the highest `total_score` are your top picks.
 
 Got any questions or cool suggestions? Feel free to reach out!
 
-* **Name:** Pawee Indulakshana
+- **Name:** Pawee Indulakshana
 
-* **Email:** p.indulakshana@gmail.com
+- **Email:** p.indulakshana@gmail.com
