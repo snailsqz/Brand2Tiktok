@@ -1,3 +1,5 @@
 .env
 *.csv
 /myenv
+__pycache__/
+*.db
