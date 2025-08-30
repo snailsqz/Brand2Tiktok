@@ -1,56 +1,50 @@
-from fastapi import FastAPI, Depends
+from fastapi import FastAPI
+from sqlmodel import Session, select
 
-from typing import Union, List
-
-from sqlalchemy.orm import Session
-
-from .database import engine, Base, get_db
-from .schema import ItemCreated, ItemResponse
+from .database import engine, create_db_and_tables
 from .models import Item
-
-
-Base.metadata.create_all(bind=engine) #Create Database, it cannot update schema
         
 app = FastAPI()
 
-@app.get("/items", response_model=List[ItemResponse])
-def read_item(db: Session = Depends(get_db)):
-    item = db.query(Item).all()
-    return item
-        
-
-@app.get("/items/{item_id}", response_model=ItemResponse)
-def read_item(item_id: int, db: Session = Depends(get_db)):
-    item = db.query(Item).filter(Item.id == item_id).first()
-    return item
+@app.on_event("startup")
+def on_startup():
+    create_db_and_tables()
 
 
-@app.post("/items", response_model=ItemResponse)
-def create_item(item: ItemCreated, db: Session = Depends(get_db)):
-    db_item = Item(**item.model_dump())
-    db.add(db_item)
-    db.commit()
-    db.refresh(db_item)
-    return db_item
+@app.get("/items/")
+def read_items():
+    with Session(engine) as session:
+        items = session.exec(select(Item)).all()
+        return items
 
+@app.post("/items/")
+def create_item(item: Item):
+    with Session(engine) as session:
+        session.add(item)
+        session.commit()
+        session.refresh(item)
+        return item
 
-@app.put("/items/{item_id}", response_model=ItemResponse)
-def update_item(item_id: int, item: ItemCreated, db: Session = Depends(get_db)):
-    db_item = db.query(Item).filter(Item.id == item_id).first()
-    if not db_item:
-        return {"error": "Item not found"}
-    for key, value in item.model_dump().items():
-        setattr(db_item, key, value)
-    db.commit()
-    db.refresh(db_item)
-    return db_item
-
-
+@app.put("/items/{item_id}")
+def update_item(item_id: int, item: Item):
+    with Session(engine) as session:
+        db_item = session.get(Item, item_id)
+        if not db_item:
+            return {"error": "Item not found"}
+        db_item.name = item.name
+        db_item.description = item.description
+        db_item.price = item.price
+        session.add(db_item)
+        session.commit()
+        session.refresh(db_item)
+        return db_item
+    
 @app.delete("/items/{item_id}")
-async def delete_item(item_id: int, db: Session = Depends(get_db)):
-    db_item = db.query(Item).filter(Item.id == item_id).first()
-    if not db_item:
-        return {"error": "Item not found"}
-    db.delete(db_item)
-    db.commit()
-    return {"message": f"Item with id {item_id} has been deleted"}
+def delete_item(item_id: int):
+    with Session(engine) as session:
+        db_item = session.get(Item, item_id)
+        if not db_item:
+            return {"error": "Item not found"}
+        session.delete(db_item)
+        session.commit()
+        return {"message": "Item deleted successfully"}
