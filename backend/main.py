@@ -3,8 +3,17 @@ from sqlmodel import Session, select
 
 from .database import engine, create_db_and_tables
 from .models import Item
+from fastapi.middleware.cors import CORSMiddleware
         
 app = FastAPI()
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["http://localhost:3000"],  # URL ของ Next.js
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 @app.on_event("startup")
 def on_startup():
