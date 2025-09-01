@@ -1,6 +1,7 @@
 # TikTok KOL Relevance Matcher
 
-The goal of this project is to create a tool for finding and ranking TikTok influencers based on their relevance to a given brand, utilizing Thai and Eng Natural Language Processing (NLP) techniques.
+The goal of this project is to create a tool for finding and ranking TikTok influencers based on their relevance to a given brand, utilizing Thai and Eng Natural Language Processing (NLP) techniques.<br>
+**File is in /backend/program.py ....currently works at frontend**
 
 ## Key Features
 
