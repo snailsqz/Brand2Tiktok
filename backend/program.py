@@ -60,13 +60,16 @@ def get_data(apikey, search_queries):
             else:
                 return {} # Handle other unexpected types
 
+        #make it json if it's string
         df['authorMeta'] = df['authorMeta'].apply(parse_json_if_string)
 
-        
+        #make dataframe from authorMeta
         author_meta_df = pd.json_normalize(df['authorMeta'])
 
+        #add author_ prefix to all columns in author_meta_df
         author_meta_df = author_meta_df.add_prefix('author_')
 
+        #Combine the two dataframe
         final_df = pd.concat([df.drop('authorMeta', axis=1), author_meta_df], axis=1)
         
         #This is the part you'll get the column you want
@@ -197,12 +200,15 @@ def find_similarity(df, processed_brand_text):
     df['relevance_score'] = similarity_scores
     
     while True:
-        weight_relevance = float(input("Enter the weight for relevance (0-1): "))
-        weight_fans = float(input("Enter the weight for fans (0-1): "))
-        if 0 <= weight_relevance <= 1 and 0 <= weight_fans <= 1:
-            break
-        else:
-            print("Invalid weights. Please enter values between 0 and 1.")
+        try:
+            weight_relevance = float(input("Enter the weight for relevance (0-1): "))
+            weight_fans = float(input("Enter the weight for fans (0-1): "))
+            if 0 <= weight_relevance <= 1 and 0 <= weight_fans <= 1:
+                break
+            else:
+                print("Invalid weights. Please enter values between 0 and 1.")
+        except ValueError:
+            print("Invalid input. Please enter a number, not a word or empty value.")
 
     # Calculate the total score
     max_fans = df['author_fans'].max()
@@ -214,7 +220,7 @@ def find_similarity(df, processed_brand_text):
     # Sort by the total score to get your final ranked list
     final_ranked_influencers = df.sort_values(by='total_score', ascending=False)
 
-    print("\nFinal Ranked Influencers (by Total Score):")
+    print("\nTop 10 Final Ranked Influencers (by Total Score):")
     print(final_ranked_influencers[['author_name', 'author_fans', 'relevance_score', 'total_score']].head(10))
     
 
